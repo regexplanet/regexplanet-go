@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -15,7 +14,8 @@ import (
 )
 
 func root_handler(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "https://www.regexplanet.com/advanced/golang/index.html", http.StatusFound)
+	w.Header().Set("Content-Type", "text/plain; charset=utf8")
+	w.Write([]byte("Running " + runtime.Version()))
 }
 
 func write_with_callback(w http.ResponseWriter, callback string, v interface{}) {
@@ -305,17 +305,22 @@ func test_handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	http.HandleFunc("/", root_handler)
+	http.HandleFunc("/{$}", root_handler)
 	http.HandleFunc("/status.json", status_handler)
 	http.HandleFunc("/test.json", test_handler)
+	http.HandleFunc("/robots.txt", staticHandler.ServeHTTP)
+	http.HandleFunc("/favicon.ico", staticHandler.ServeHTTP)
+	http.HandleFunc("/favicon.svg", staticHandler.ServeHTTP)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "4000"
+	var listenAddress = os.Getenv("ADDRESS")
+
+	var listenPort, portErr = strconv.Atoi(os.Getenv("PORT"))
+	if portErr != nil {
+		listenPort = 4000
 	}
 
-	log.Printf("Listening on port %s", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatal(err)
+	logger.Info("Listening", "address", listenAddress, "port", listenPort)
+	if err := http.ListenAndServe(listenAddress+":"+strconv.Itoa(listenPort), nil); err != nil {
+		logger.Error("unable to listen", "address", listenAddress, "port", listenPort, "error", err)
 	}
 }

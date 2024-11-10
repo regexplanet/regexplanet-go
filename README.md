@@ -1,4 +1,6 @@
-# regexplanet-golang
+# regexplanet-go
+
+[![build](https://github.com/regexplanet/regexplanet-go/actions/workflows/gcr-deploy.yaml/badge.svg)](https://github.com/regexplanet/regexplanet-go/actions/workflows/gcr-deploy.yaml)
 
 This is the [Go language](http://www.golang.org/) backend for RegexPlanet, a tool for online regular expression testing.
 
